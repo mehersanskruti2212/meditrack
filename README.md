@@ -1,16 +1,16 @@
-## Hi there 👋
+# MediTrack - Local Healthcare & Medicine Availability Tracker
 
-<!--
-**mehersanskruti2212/mehersanskruti2212** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+Run:
+    pip install -r requirements.txt
+    python app.py
+Open http://127.0.0.1:5000  (database + demo data auto-create on first run)
 
-Here are some ideas to get you started:
+Demo logins:
+    User   : user@demo.com   / user123
+    Owner  : owner1@demo.com / owner123   (Pharmacy owner panel)
+    Owner  : owner2@demo.com / owner123
+Reset data: delete meditrack.db and run again.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+Admin login : admin@demo.com / admin123  (Admin Panel: manage users, pharmacies, add medicines)
+Add more medicines in bulk: edit catalog.py (new ones are added automatically on next run).
+See ROADMAP.md for next-semester feature ideas.

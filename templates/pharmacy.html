@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% block content %}
+<div class="card p-4 mb-3"><h3>🏪 {{p.name}}</h3><div>{{p.address}} · 📞 {{p.phone}} {% if p.dist is not none %}· <b>{{p.dist}} km away</b>{% endif %}</div>
+<div>{% if p.rating %}<span class="text-warning fs-5">{{stars(p.rating)}}</span> <b>{{p.rating}}</b> <small class="text-muted">({{p.nrev}} reviews)</small>{% else %}<small class="text-muted">No reviews yet</small>{% endif %}</div>
+<a target="_blank" href="https://www.google.com/maps/dir/?api=1&destination={{p.lat}},{{p.lon}}" class="small">🧭 Get directions (Google Maps)</a></div>
+<div class="table-responsive card mb-4"><table class="table mb-0 align-middle"><thead><tr><th>Medicine</th><th>Category</th><th>Price</th><th>Status</th><th></th></tr></thead><tbody>
+{% for i in items %}{% set s=status(i.quantity) %}<tr><td><a href="/medicine/{{i.medicine_id}}">{{i.name}}</a></td><td>{{i.category}}</td><td>₹{{'%.2f'|format(i.price)}}</td>
+<td><span class="badge bg-{{s[1]}}">{{s[0]}}</span></td><td>{% if i.quantity>0 %}<form method="post" action="/reserve"><input type="hidden" name="stock_id" value="{{i.id}}"><input type="hidden" name="qty" value="1"><button class="btn btn-sm btn-success">Reserve 1</button></form>{% endif %}</td></tr>
+{% else %}<tr><td colspan="5" class="text-center text-muted">No stock listed.</td></tr>{% endfor %}</tbody></table></div>
+<h5>⭐ Reviews</h5>
+{% if role=='user' %}<form method="post" action="/review" class="card p-3 mb-3 row g-2 flex-row"><input type="hidden" name="pharmacy_id" value="{{p.id}}">
+<div class="col-md-2"><select name="rating" class="form-select">{% for n in (5,4,3,2,1) %}<option value="{{n}}">{{n}} ★</option>{% endfor %}</select></div>
+<div class="col-md-8"><input name="comment" class="form-control" placeholder="Share your experience (optional)" maxlength="300"></div><div class="col-md-2"><button class="btn btn-success w-100">Submit</button></div></form>{% endif %}
+{% for r in revs %}<div class="card p-3 mb-2"><div><span class="text-warning">{{stars(r.rating)}}</span> <b>{{r.uname}}</b> <small class="text-muted">{{r.created[:10]}}</small></div>{% if r.comment %}<div>{{r.comment}}</div>{% endif %}</div>
+{% else %}<p class="text-muted">No reviews yet. {% if not cu %}<a href="/login">Login</a> to add one.{% endif %}</p>{% endfor %}{% endblock %}

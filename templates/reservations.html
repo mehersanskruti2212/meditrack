@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block content %}<h4>My Reservations</h4>
+<div class="table-responsive card"><table class="table mb-0 align-middle"><thead><tr><th>Code</th><th>Medicine</th><th>Qty</th><th>Pharmacy</th><th>Status</th><th>Date</th><th></th></tr></thead><tbody>
+{% for r in rows %}<tr><td><b>{{rcode(r.id)}}</b></td><td>{{r.mname}}</td><td>{{r.qty}}</td><td>{{r.pname}}<br><small class="text-muted">{{r.address}} · 📞 {{r.phone}}</small></td>
+<td><span class="badge bg-{{ {'Reserved':'primary','Collected':'success','Cancelled':'secondary'}[r.status] }}">{{r.status}}</span></td><td>{{r.created[:16]}}</td>
+<td><a href="/slip/{{r.id}}" target="_blank" class="btn btn-sm btn-outline-secondary">🖨️ Slip</a> {% if r.status=='Reserved' %}<a href="/cancel/{{r.id}}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel reservation?')">Cancel</a>{% endif %}</td></tr>
+{% else %}<tr><td colspan="7" class="text-center text-muted">No reservations yet.</td></tr>{% endfor %}</tbody></table></div>{% endblock %}

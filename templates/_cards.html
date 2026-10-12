@@ -1,0 +1,8 @@
+<div class="row g-3">{% for m in meds %}<div class="col-md-6 col-lg-4"><div class="card h-100 p-3">
+<div class="d-flex justify-content-between"><h5>{{m.name}}</h5><a href="/favorite/{{m.id}}" class="text-decoration-none fs-5" title="Favorite">{{ '❤️' if m.id in favs else '🤍' }}</a></div>
+<div class="mb-2"><span class="badge bg-info text-dark">{{m.category}}</span> {% if is_rx(m.category) %}<span class="badge bg-danger">Rx</span>{% endif %}
+<span class="badge bg-{{'success' if m.avail else 'danger'}}">{{'Available' if m.avail else 'Out of Stock'}}</span></div>
+<small class="text-muted">{{m.description}}</small>
+<div class="mt-2 small">{% if m.avail %}In stock at <b>{{m.avail}}</b> pharmacies · from <b>₹{{'%.2f'|format(m.minp)}}</b>{% else %}Not available nearby right now{% endif %}</div>
+<a href="/medicine/{{m.id}}" class="btn btn-outline-success btn-sm mt-auto">View & Compare</a></div></div>
+{% else %}<p class="text-muted">No medicines found.</p>{% endfor %}</div>

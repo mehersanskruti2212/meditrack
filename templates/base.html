@@ -1,0 +1,65 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MediTrack</title>
+<script>if(localStorage.getItem('theme')==='dark')document.documentElement.setAttribute('data-bs-theme','dark')</script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+<style>:root{--amber:#e9a23b;--navy:#0f1b2d}
+body{font-family:'DM Sans',sans-serif;background:#f6f7f9}h1,h2,h3,.serif{font-family:'Playfair Display',serif}
+.navbar{background:var(--navy)!important;border-bottom:1px solid #ffffff18}.navbar .nav-link{color:#cbd5e1;font-size:.9rem}.navbar .nav-link:hover{color:var(--amber)}
+.logo{background:var(--amber);border-radius:8px;padding:2px 7px;margin-right:6px}
+.card{border:0;box-shadow:0 2px 10px #0001;border-radius:14px}.cat:hover{transform:translateY(-3px);transition:.2s}
+.btn-success{background:var(--amber);border-color:var(--amber);color:#111;font-weight:600}.btn-success:hover{background:#d4902a;border-color:#d4902a;color:#111}
+.btn-outline-success{color:#a8691a;border-color:var(--amber)}.btn-outline-success:hover{background:var(--amber);border-color:var(--amber);color:#111}
+footer{background:var(--navy);color:#94a3b8;padding:18px 0;margin-top:40px}
+[data-bs-theme=dark] body{background:#0b1220}[data-bs-theme=dark] .card .text-dark:not(.badge){color:#e5e7eb!important}[data-bs-theme=dark] .table-success{--bs-table-bg:#14532d}</style></head><body>
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top"><div class="container">
+<a class="navbar-brand fw-bold" href="/"><span class="logo">💊</span>MediTrack</a>
+<button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#nv"><span class="navbar-toggler-icon"></span></button>
+<div id="nv" class="collapse navbar-collapse"><ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="/search">Medicines</a></li>
+<li class="nav-item"><a class="nav-link" href="/pharmacies">Nearby Pharmacies</a></li>
+{% if role=='user' %}<li class="nav-item"><a class="nav-link" href="/favorites">❤️ Favorites</a></li>{% endif %}
+<li class="nav-item"><a class="nav-link" href="/emergency">Emergency & Tips</a></li>
+{% if role=='admin' %}<li class="nav-item"><a class="nav-link" href="/admin">🛠️ Admin Panel</a></li>{% endif %}
+{% if role=='user' %}<li class="nav-item"><a class="nav-link" href="/my-reservations">My Reservations</a></li>{% endif %}
+{% if role=='owner' %}<li class="nav-item"><a class="nav-link" href="/owner">Pharmacy Panel</a></li>{% endif %}</ul>
+<form class="d-flex me-2 my-2 my-lg-0" onsubmit="return findLoc(event)"><input id="locq" class="form-control form-control-sm" style="min-width:190px" placeholder="📍 Enter your area / city" value="{{ loc_label if loc_label!='My location' else '' }}">
+<button id="locbtn" class="btn btn-sm btn-success ms-1">Go</button><button type="button" class="btn btn-sm btn-light ms-1" title="Use my GPS location" onclick="getLoc()">🎯</button></form>
+<button type="button" class="btn btn-sm btn-outline-light me-2" onclick="toggleTheme()" title="Dark / Light mode">🌓</button>
+{% if cu %}<a class="text-white me-3 text-decoration-none" href="/notifications">🔔{% if ncount %}<span class="badge bg-danger ms-1">{{ncount}}</span>{% endif %}</a><a class="text-white me-2 text-decoration-none" href="/profile">Hi, {{ cu }}</a><a class="btn btn-sm btn-outline-light" href="/logout">Logout</a>
+{% else %}<a class="btn btn-sm btn-outline-light me-1" href="/login">Login</a><a class="btn btn-sm btn-success" href="/register">Register</a>{% endif %}
+</div></div></nav>
+{% block hero %}{% endblock %}
+<div class="container my-4">
+{% with msgs=get_flashed_messages(with_categories=true) %}{% for c,m in msgs %}<div class="alert alert-{{c}} alert-dismissible fade show">{{m}}<button class="btn-close" data-bs-dismiss="alert"></button></div>{% endfor %}{% endwith %}
+{% block content %}{% endblock %}</div>
+<footer class="text-center small">MediTrack – Local Healthcare & Medicine Availability Tracker</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleTheme(){const d=document.documentElement,dark=d.getAttribute('data-bs-theme')==='dark';if(dark){d.removeAttribute('data-bs-theme');localStorage.setItem('theme','light')}else{d.setAttribute('data-bs-theme','dark');localStorage.setItem('theme','dark')}}
+async function saveLoc(lat,lon,label){
+ const btn=document.getElementById('locbtn'); btn.disabled=true; btn.textContent='...';
+ let ph=[];
+ try{const q='[out:json][timeout:20];(node["amenity"="pharmacy"](around:7000,'+lat+','+lon+');way["amenity"="pharmacy"](around:7000,'+lat+','+lon+'););out center 30;';
+  const r=await fetch('https://overpass-api.de/api/interpreter',{method:'POST',body:'data='+encodeURIComponent(q)}); const j=await r.json();
+  ph=j.elements.map(e=>{const t=e.tags||{},c=e.center||e;return {name:t.name||'Medical Store',lat:c.lat,lon:c.lon,phone:t.phone||t['contact:phone']||'',address:[t['addr:housenumber'],t['addr:street'],t['addr:suburb'],t['addr:city']].filter(Boolean).join(', ')}})}catch(e){}
+ await fetch('/set_location',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat:lat,lon:lon,label:label,pharmacies:ph})});
+ location.href='/pharmacies';
+}
+async function geocode(q){
+ const m=q.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/); if(m) return [parseFloat(m[1]),parseFloat(m[2])];
+ const parts=q.split(',').map(x=>x.trim()).filter(Boolean), tries=[q, parts.join(' '), q+', India'];
+ for(let i=1;i<parts.length;i++) tries.push(parts.slice(i).join(' '), parts.slice(i).join(' ')+', India');
+ tries.push(parts[0]+', India');
+ for(const t of tries){ try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(t)); const j=await r.json();
+   if(j.length) return [parseFloat(j[0].lat),parseFloat(j[0].lon)];}catch(e){} }
+ return null;
+}
+async function findLoc(ev){ev.preventDefault();const q=document.getElementById('locq').value.trim();if(!q)return false;
+ const g=await geocode(q);
+ if(!g){alert('Location not found. Try a nearby bigger town/city name (e.g. "Boisar" or "Palghar"), or type coordinates like 19.80, 72.75');return false}
+ await saveLoc(g[0],g[1],q); return false}
+function getLoc(){if(!navigator.geolocation){alert('Geolocation not supported');return}
+ navigator.geolocation.getCurrentPosition(p=>saveLoc(p.coords.latitude,p.coords.longitude,'My location'),()=>alert('Location permission denied'))}
+document.querySelectorAll('input[name=q]').forEach(i=>{i.setAttribute('list','sug');let t;i.addEventListener('input',()=>{clearTimeout(t);t=setTimeout(async()=>{if(i.value.length<2)return;const r=await fetch('/api/suggest?q='+encodeURIComponent(i.value));document.getElementById('sug').innerHTML=(await r.json()).map(n=>'<option value="'+n.replace(/"/g,'&quot;')+'">').join('')},200)})});
+</script><datalist id="sug"></datalist></body></html>

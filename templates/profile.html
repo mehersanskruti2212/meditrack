@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block content %}<div class="row justify-content-center"><div class="col-md-6"><div class="card p-4"><h4>👤 My Profile</h4><p class="text-muted mb-3">{{u.email}} · {{u.role|capitalize}}</p>
+<form method="post"><label class="small fw-bold">Name</label><input name="name" value="{{u.name}}" class="form-control mb-3" required>
+<label class="small fw-bold">Change password (optional)</label><input name="old_password" type="password" class="form-control mb-2" placeholder="Current password"><input name="new_password" type="password" class="form-control mb-3" placeholder="New password (min 4)">
+<button class="btn btn-success">Save changes</button></form></div></div></div>{% endblock %}

@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}<h3 class="mb-1">🚑 Emergency & Health Tips</h3><p class="text-muted">Important helpline numbers (India). Please verify locally.</p>
+<div class="row g-3 mb-4">{% for n,t in [('112','National Emergency'),('108','Ambulance'),('102','Mother & Child Ambulance'),('100','Police'),('101','Fire'),('1091','Women Helpline'),('14416','Tele-MANAS Mental Health')] %}
+<div class="col-6 col-md-3"><div class="card p-3 text-center"><div class="fs-2 fw-bold text-danger">{{n}}</div><small>{{t}}</small></div></div>{% endfor %}</div>
+<h5>💡 Safe medicine tips</h5><div class="row g-3">{% for t in ['Always check the expiry date before buying or using a medicine.','Take antibiotics only when prescribed, and complete the full course.','Do not share your prescription medicines with others.','Store medicines in a cool, dry place away from children.','Keep a list of your regular medicines when visiting a doctor.','Use MediTrack to reserve medicines so you avoid unnecessary trips.'] %}
+<div class="col-md-4"><div class="card p-3 h-100">✅ {{t}}</div></div>{% endfor %}</div>{% endblock %}

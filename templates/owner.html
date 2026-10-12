@@ -1,0 +1,31 @@
+{% extends 'base.html' %}{% block content %}<h4>Pharmacy Panel</h4>
+{% if p %}<div class="row g-3 mb-4 text-center">{% for n,v,c in [('Medicines listed',stats.total,'primary'),('Low stock',stats.low,'warning'),('Out of stock',stats.out,'danger'),('Pending reservations',stats.pending,'info'),('Collected',stats.done,'success')] %}
+<div class="col-6 col-md"><div class="card p-3"><div class="fs-2 fw-bold text-{{c}}">{{v}}</div><small>{{n}}</small></div></div>{% endfor %}</div>
+{% if stats.low or stats.out %}<div class="alert alert-warning">⚠️ {{stats.low}} item(s) running low and {{stats.out}} out of stock - update your stock below.</div>{% endif %}{% endif %}
+<div class="card p-3 mb-4"><h6>{{ 'Pharmacy details' if p else 'Create your pharmacy' }}</h6>
+<form method="post" action="/owner/pharmacy" class="row g-2">
+<div class="col-md-4"><input name="name" value="{{p.name if p}}" class="form-control" placeholder="Pharmacy name" required></div>
+<div class="col-md-4"><input name="address" value="{{p.address if p}}" class="form-control" placeholder="Address" required></div>
+<div class="col-md-4"><input name="phone" value="{{p.phone if p}}" class="form-control" placeholder="Phone" required></div>
+<div class="col-md-3"><input name="lat" id="lat" value="{{p.lat if p}}" class="form-control" placeholder="Latitude"></div>
+<div class="col-md-3"><input name="lon" id="lon" value="{{p.lon if p}}" class="form-control" placeholder="Longitude"></div>
+<div class="col-md-3"><button type="button" class="btn btn-outline-secondary w-100" onclick="navigator.geolocation.getCurrentPosition(x=>{lat.value=x.coords.latitude;lon.value=x.coords.longitude})">📍 Use current location</button></div>
+<div class="col-md-3"><button class="btn btn-success w-100">Save</button></div></form></div>
+{% if p %}
+<div class="card p-3 mb-4"><h6>Add / update stock</h6><form method="post" action="/owner/stock" class="row g-2">
+<div class="col-md-4"><select name="medicine_id" class="form-select"><option value="">-- New medicine (fill below) --</option>{% for m in meds %}<option value="{{m.id}}">{{m.name}}</option>{% endfor %}</select></div>
+<div class="col-md-2"><input name="price" type="number" step="0.01" min="0" class="form-control" placeholder="Price ₹" required></div>
+<div class="col-md-2"><input name="quantity" type="number" min="0" class="form-control" placeholder="Quantity" required></div>
+<div class="col-md-4"></div>
+<div class="col-md-4"><input name="new_name" class="form-control" placeholder="New medicine name (optional)"></div>
+<div class="col-md-3"><select name="category" class="form-select">{% for c in categories %}<option>{{c}}</option>{% endfor %}</select></div>
+<div class="col-md-3"><input name="description" class="form-control" placeholder="Description"></div>
+<div class="col-md-2"><button class="btn btn-success w-100">Save stock</button></div></form></div>
+<h6>My stock</h6><div class="table-responsive card mb-4"><table class="table mb-0 align-middle"><thead><tr><th>Medicine</th><th>Category</th><th>Price</th><th>Qty</th><th>Status</th><th></th></tr></thead><tbody>
+{% for i in items %}{% set s=status(i.quantity) %}<tr><td>{{i.name}}</td><td>{{i.category}}</td><td>₹{{'%.2f'|format(i.price)}}</td><td>{{i.quantity}}</td><td><span class="badge bg-{{s[1]}}">{{s[0]}}</span></td>
+<td><a href="/owner/stock/{{i.id}}/delete" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove?')">Remove</a></td></tr>
+{% else %}<tr><td colspan="6" class="text-center text-muted">No stock yet.</td></tr>{% endfor %}</tbody></table></div>
+<h6>Reservations</h6><div class="table-responsive card"><table class="table mb-0 align-middle"><thead><tr><th>Code</th><th>Customer</th><th>Medicine</th><th>Qty</th><th>Status</th><th></th></tr></thead><tbody>
+{% for r in res %}<tr><td><b>{{rcode(r.id)}}</b></td><td>{{r.uname}}<br><small class="text-muted">{{r.email}}</small></td><td>{{r.mname}}</td><td>{{r.qty}}</td><td>{{r.status}}</td>
+<td>{% if r.status=='Reserved' %}<a href="/owner/reservation/{{r.id}}/collect" class="btn btn-sm btn-success">Collected</a> <a href="/owner/reservation/{{r.id}}/cancel" class="btn btn-sm btn-outline-danger">Cancel</a>{% endif %}</td></tr>
+{% else %}<tr><td colspan="6" class="text-center text-muted">No reservations.</td></tr>{% endfor %}</tbody></table></div>{% endif %}{% endblock %}

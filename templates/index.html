@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block hero %}
+<style>
+.hero{position:relative;min-height:88vh;overflow:hidden;background:#111}.hero .carousel,.hero .carousel-inner,.hero .carousel-item{position:absolute;inset:0;height:100%}
+.hero img{width:100%;height:100%;object-fit:cover}
+.hero-ov{position:relative;z-index:3;min-height:88vh;display:flex;align-items:center;background:linear-gradient(90deg,rgba(8,12,20,.85),rgba(8,12,20,.35));pointer-events:none}
+.hero-ov a{pointer-events:auto}
+.pill{display:inline-block;border:1px solid #e9a23b66;background:#e9a23b1f;color:var(--amber);font-size:.8rem;padding:5px 14px;border-radius:30px}
+.hero h1{font-size:clamp(2.2rem,5.5vw,4rem);font-weight:700;color:#fff;line-height:1.1}.hero h1 span{color:var(--amber)}
+.hero p{color:#d5dbe5;max-width:560px}
+.hbtn{position:absolute;z-index:5;top:50%;width:40px;height:40px;border-radius:50%;background:#0008;border:1px solid #fff4;color:#fff;font-size:1.3rem;line-height:1}
+.hbtn.l{left:18px}.hbtn.r{right:18px}
+.search-card{margin-top:-70px;position:relative;z-index:6;padding:22px}
+.eyebrow{color:#b7791f;font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.step{width:46px;height:46px;border-radius:50%;background:var(--amber);font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.cta{background:var(--navy);color:#fff;border-radius:18px}
+</style>
+<section class="hero">
+<div id="hs" class="carousel slide" data-bs-ride="carousel" data-bs-interval="3500" data-bs-pause="false"><div class="carousel-inner">
+{% for i in (1,2,3) %}<div class="carousel-item {{'active' if i==1}}"><img src="{{ url_for('static', filename='images/hero'~i~'.jpg') }}" alt="MediTrack"></div>{% endfor %}</div></div>
+<button class="hbtn l" data-bs-target="#hs" data-bs-slide="prev">‹</button><button class="hbtn r" data-bs-target="#hs" data-bs-slide="next">›</button>
+<div class="hero-ov"><div class="container"><span class="pill">💊 Connecting Patients With Pharmacies</span>
+<h1 class="mt-3">Find Medicines.<br><span>Nearby.</span><br>Without The Wait.</h1>
+<p class="mt-3">MediTrack helps you check medicine availability, compare prices and reserve from nearby pharmacies before you visit, saving time and unnecessary trips.</p>
+<div class="d-flex gap-2 flex-wrap mt-4"><a href="#categories" class="btn btn-success btn-lg">Explore Medicines →</a><a href="/register" class="btn btn-outline-light btn-lg">Join as Pharmacy</a></div></div></div>
+</section>
+{% endblock %}
+{% block content %}
+<div class="card search-card"><form action="/search" class="row g-2 align-items-end">
+<div class="col-md-5"><label class="small fw-bold">What medicine do you need?</label><input name="q" class="form-control form-control-lg" placeholder="e.g. Paracetamol"></div>
+<div class="col-md-4"><label class="small fw-bold">Category</label><select name="category" class="form-select form-select-lg"><option value="">All categories</option>{% for c in categories %}<option>{{c}}</option>{% endfor %}</select></div>
+<div class="col-md-3"><button class="btn btn-success btn-lg w-100">🔎 Find Medicines</button></div></form></div>
+
+<div id="categories" class="text-center mt-5 mb-4"><div class="eyebrow">Explore Medicines</div><h2 class="fw-bold">Everything You Need, By Category</h2></div>
+{% set icons={'Pain Relief':'🩹','Fever':'🌡️','Vitamins':'🍊','Diabetes':'🩸','Skin Care':'🧴','Cold & Cough':'🤧','Antibiotics':'💊','Digestion & Acidity':'🍽️','Allergy':'🌼','Heart & BP':'❤️','First Aid':'🩹','Eye & Ear Care':'👁️'} %}
+<div class="row g-3">{% for c in categories %}<div class="col-6 col-md-4 col-lg-3"><a href="/search?category={{c|urlencode}}" class="text-decoration-none">
+<div class="card cat text-center p-4"><div class="fs-1">{{icons[c]}}</div><h5 class="text-dark mt-2">{{c}}</h5><small class="text-muted">{{counts.get(c,0)}} medicines · Explore →</small></div></a></div>{% endfor %}</div>
+
+<div class="text-center mt-5 mb-4"><div class="eyebrow">Why MediTrack</div><h2 class="fw-bold">A Smarter Way To Find Medicines</h2></div>
+<div class="row g-3">{% for ic,t,d in [('🔍','Search Medicines','Find any medicine by name and see where it is available.'),('📍','Nearby Pharmacies','Sorted by distance from your location.'),('💰','Compare Prices','See every pharmacy price, cheapest highlighted.'),('✅','Live Availability','Available, low stock or out of stock at a glance.'),('📦','Reserve Medicine','Reserve first, collect when you visit.'),('🏪','Pharmacy Panel','Owners manage stock, prices and reservations.')] %}
+<div class="col-md-4"><div class="card p-4 h-100"><div class="fs-2">{{ic}}</div><h5 class="mt-2">{{t}}</h5><small class="text-muted">{{d}}</small></div></div>{% endfor %}</div>
+
+<div class="text-center mt-5 mb-4"><div class="eyebrow">Simple Process</div><h2 class="fw-bold">How MediTrack Works</h2></div>
+<div class="row g-3 text-center">{% for n,t,d in [(1,'Search','Enter the medicine name.'),(2,'Set Location','Allow location for nearby results.'),(3,'Compare','Check price and stock.'),(4,'Reserve','Reserve and pick it up.')] %}
+<div class="col-6 col-md-3"><div class="step">{{n}}</div><h6>{{t}}</h6><small class="text-muted">{{d}}</small></div>{% endfor %}</div>
+
+<div class="cta text-center p-5 mt-5"><h2 class="fw-bold">Save Time. Find Medicines Faster.</h2><p class="text-secondary">Create a free account or register your pharmacy today.</p>
+<a href="/register" class="btn btn-success btn-lg">Create Your Account →</a></div>
+{% endblock %}

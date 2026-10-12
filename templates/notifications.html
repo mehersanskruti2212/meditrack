@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}<h4>🔔 Notifications</h4>
+{% for r in rows %}<a href="{{r.link or '#'}}" class="text-decoration-none"><div class="card p-3 mb-2"><div class="text-dark">{{r.text}}</div><small class="text-muted">{{r.created[:16]}}</small></div></a>
+{% else %}<p class="text-muted">No notifications yet. Use "Notify me when available" on out-of-stock medicines.</p>{% endfor %}{% endblock %}

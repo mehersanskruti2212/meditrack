@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block content %}<h4>Nearby Pharmacies{% if has_loc %} <small class="text-muted fs-6">within {{radius}} km of {{loc_label or 'your location'}}</small>{% endif %}</h4>
+{% if not has_loc %}<div class="alert alert-info">Enter your <b>area / city</b> in the top bar (or press 🎯) to see pharmacies near you.</div>{% endif %}
+{% if has_loc and not rows %}<div class="alert alert-warning">No pharmacies found near this location. Try a nearby bigger town/city name in the top bar.</div>{% endif %}
+<div class="row g-3">{% for p in rows %}<div class="col-md-6"><div class="card p-3"><div class="d-flex justify-content-between"><h5>🏪 {{p.name}}</h5>
+{% if p.dist is not none %}<span class="badge bg-primary align-self-start">{{p.dist}} km</span>{% endif %}</div>
+<div class="text-muted">{{p.address}} · 📞 {{p.phone}}</div>
+<div class="small">{% if p.rating %}<span class="text-warning">{{stars(p.rating)}}</span> {{p.rating}} ({{p.nrev}}){% else %}<span class="text-muted">No reviews yet</span>{% endif %}</div><div class="mt-2"><a href="/pharmacy/{{p.id}}" class="btn btn-sm btn-outline-success">View medicines</a>
+<a target="_blank" href="https://www.google.com/maps?q={{p.lat}},{{p.lon}}" class="btn btn-sm btn-outline-secondary">Open in Maps</a></div></div></div>{% endfor %}</div>{% endblock %}

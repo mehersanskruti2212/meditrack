@@ -1,0 +1,5 @@
+{% extends 'base.html' %}{% block content %}<div class="row justify-content-center"><div class="col-md-5"><div class="card p-4"><h4>Create account</h4>
+<form method="post"><input name="name" class="form-control mb-2" placeholder="Full name" required><input name="email" type="email" class="form-control mb-2" placeholder="Email" required>
+<input name="password" type="password" class="form-control mb-2" placeholder="Password (min 4)" required>
+<select name="role" class="form-select mb-3"><option value="user">I am a user (find medicines)</option><option value="owner">I am a pharmacy owner</option></select>
+<button class="btn btn-success w-100">Register</button></form></div></div></div>{% endblock %}

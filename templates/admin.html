@@ -1,0 +1,11 @@
+{% extends 'base.html' %}{% block content %}<h4>🛠️ Admin Panel</h4>
+<div class="row g-3 mb-4 text-center">{% for n,v in [('Users',stats.users),('Pharmacy owners',stats.owners),('Pharmacies',stats.pharmacies),('Medicines',stats.medicines),('Reservations',stats.reservations)] %}
+<div class="col-6 col-md"><div class="card p-3"><div class="fs-2 fw-bold">{{v}}</div><small>{{n}}</small></div></div>{% endfor %}</div>
+<div class="card p-3 mb-4"><h6>Add new medicine</h6><form method="post" action="/admin/medicine" class="row g-2">
+<div class="col-md-3"><input name="name" class="form-control" placeholder="Medicine name" required></div><div class="col-md-2"><input name="generic" class="form-control" placeholder="Generic name"></div>
+<div class="col-md-2"><select name="category" class="form-select">{% for c in categories %}<option>{{c}}</option>{% endfor %}</select></div>
+<div class="col-md-3"><input name="description" class="form-control" placeholder="Description"></div><div class="col-md-2"><button class="btn btn-success w-100">Add</button></div></form></div>
+<h6>Pharmacies</h6><div class="table-responsive card mb-4" style="max-height:340px;overflow:auto"><table class="table table-sm mb-0 align-middle"><thead><tr><th>ID</th><th>Name</th><th>Address</th><th>Owner</th><th></th></tr></thead><tbody>
+{% for p in pharms %}<tr><td>{{p.id}}</td><td>{{p.name}}</td><td>{{p.address}}</td><td>{{p.oname or 'auto'}}</td><td><a href="/admin/delete/pharmacy/{{p.id}}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete pharmacy?')">Delete</a></td></tr>{% endfor %}</tbody></table></div>
+<h6>Users</h6><div class="table-responsive card"><table class="table table-sm mb-0 align-middle"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead><tbody>
+{% for u in users %}<tr><td>{{u.id}}</td><td>{{u.name}}</td><td>{{u.email}}</td><td>{{u.role}}</td><td>{% if u.role!='admin' %}<a href="/admin/delete/user/{{u.id}}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete user?')">Delete</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% endblock %}
